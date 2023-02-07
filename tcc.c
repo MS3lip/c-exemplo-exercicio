@@ -115,7 +115,7 @@ void opcao_menu(int op)
         if (_numLivro > 1)
         {
           menu_listar();
-          scanf("%d", &opS);
+          scanf("%d ", &opS);
           fflush(stdin);
           opcao_listar_menu(opS);
         }
@@ -910,7 +910,7 @@ void salvarArquivo()
   FILE *Larq; // pra salvar em arquivo precisa declarar uma variavel do tipo file
 
   // abrir o arquivo
-  Larq = fopen("ArqLivros.txt", "a"); // um dos modos de abrir o arquivo é com w de write onde ele escreve os dados. o W apaga os dados e sobrescreve
+  Larq = fopen("ArqLivros.txt", "W"); // um dos modos de abrir o arquivo é com w de write onde ele escreve os dados. o W apaga os dados e sobrescreve
 
   if (Larq == NULL)
   {
@@ -945,10 +945,11 @@ void salvarArquivo()
 void recuperarDados()
 {
   int i, separador, j;
+  int t = 0;
   char str[100], c;
   FILE *Larq; // abre o arquivo
 
-  Larq = fopen("ArqLivros.txt", "ar");
+  Larq = fopen("ArqLivros.txt", "r");
   if (Larq)
   {
     i = 0;         // usado para indexar a string
@@ -1022,7 +1023,12 @@ void recuperarDados()
           else
           {
             j = _Biblioteca[_numLivro].numAutores;
-            _Biblioteca[_numLivro].autor_es = (char **)realloc(_Biblioteca[_numLivro].autor_es, (j + 1) * sizeof(char *));
+
+            if (j == 0)
+            {
+              _Biblioteca[_numLivro].autor_es = (char **)malloc(1 * sizeof(char));
+            }
+
             _Biblioteca[_numLivro].autor_es[j] = (char *)malloc((strlen(str) + 1) * sizeof(char *));
             strcpy(_Biblioteca[_numLivro].autor_es[j], str);
             _Biblioteca[_numLivro].numAutores++;
@@ -1041,11 +1047,17 @@ void recuperarDados()
           }
           else
           {
-            j = _Biblioteca[_numLivro].numAssunto;
-            _Biblioteca[_numLivro].assunto = (char **)realloc(_Biblioteca[_numLivro].assunto, (j + 1) * sizeof(char *));
-            _Biblioteca[_numLivro].assunto[j] = (char *)malloc((strlen(str) + 1) * sizeof(char *));
-            strcpy(_Biblioteca[_numLivro].assunto[j], str);
+            // t = _Biblioteca[_numLivro].numAssunto;
+
+            if (t == 0)
+            {
+              _Biblioteca[_numLivro].assunto = (char **)malloc(1 * sizeof(char));
+            }
+
+            _Biblioteca[_numLivro].assunto[t] = (char *)malloc((strlen(str) + 1) * sizeof(char *));
+            strcpy(_Biblioteca[_numLivro].assunto[t], str);
             _Biblioteca[_numLivro].numAssunto++;
+            t++;
           }
           separador = -2;
         }
