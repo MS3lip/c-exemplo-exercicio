@@ -53,11 +53,18 @@ int addOutroAssunto();
 void salvarLivro();
 void imprimeLivro(TLivro livro);
 void listarTodosLivros();
+void listarUmLivro();
+void imprimirLivroEscolhido(TLivro livro);
+void menuEditarLivro(TLivro livro);
 
 int main()
 {
+  //  Recuperar os livros salvos
   recuperarDadosLivros();
+
+  // Menu Principal
   menuPrincipal();
+
   return 0;
 }
 
@@ -109,10 +116,12 @@ int listarLivro()
   while (op != 3)
   {
     system("cls"); // limpar a tela
-    printf("*********** LISTAR LIVRO(S) ************\n");
-    printf(" - (1) Listar Livro\n");
-    printf(" - (2) Listar Todos\n");
-    printf(" - (3) Voltar Opcao Anterior\n");
+    printf("*****************************************************\n");
+    printf("***               LISTAR LIVRO(S)                 ***\n");
+    printf("*** - (1) Listar Livro                            ***\n");
+    printf("*** - (2) Listar Todos                            ***\n");
+    printf("*** - (3) Voltar Opcao Anterior                   ***\n");
+    printf("*****************************************************\n");
     printf("\n");
     printf(" - Digite uma opcao : ");
 
@@ -122,7 +131,7 @@ int listarLivro()
     switch (op)
     {
     case 1:
-      // listarUmLivro();
+      listarUmLivro();
       break;
     case 2:
       listarTodosLivros();
@@ -139,6 +148,106 @@ int listarLivro()
 
 int editarLivro()
 {
+  //  Recuperar os livros salvos
+  _numLivro = 0;
+  recuperarDadosLivros();
+
+  if (_numLivro == 0)
+  {
+    mensagemError(-2);
+    system("pause");
+  }
+  else
+  {
+    int i, op;
+
+    while (op != 0)
+    {
+      //  HEADER
+      system("cls");
+      printf("*****************************************************\n");
+      printf("***        LISTA DE LIVRO - PARA EDICAO           ***\n\n");
+
+      //  CARREGAR A LISTA
+      for (i = 0; i < _numLivro; i++)
+        printf("*** LIVRO %d: %s \n", (i + 1), _Biblioteca[i].titulo);
+
+      //  ESCOLHA UM LIVRO
+      printf("\n");
+      printf("....Para voltar ao Menu anterior digite 0 \n");
+      printf("\n");
+      printf("Selecione um Livro da lista: ");
+
+      scanf("%d", &op);
+      fflush(stdin);
+
+      //  VALIDAR SE É UM LIVRO VÁLIDO
+      if (op > 0 && op < _numLivro)
+      {
+        menuEditarLivro(_Biblioteca[(op - 1)]);
+        break;
+      }
+      else
+      {
+        //  Código de retorno ao menu anterior
+        if (op == 0)
+          break;
+
+        mensagemError(0);
+        system("pause");
+      }
+    }
+  }
+  return 1;
+}
+
+void menuEditarLivro(TLivro livro)
+{
+  int op = 0;
+
+  while (op != 8)
+  {
+    system("cls");
+    printf("*****************************************************\n");
+    printf("***      Digite a opcao que deseja alterar        ***\n");
+    printf("*** - (1) Titulo                                  ***\n");
+    printf("*** - (2) Autor (es)                              ***\n");
+    printf("*** - (3) Editora                                 ***\n");
+    printf("*** - (4) Numero de paginas                       ***\n");
+    printf("*** - (5) Ano de Edicao                           ***\n");
+    printf("*** - (6) Idioma                                  ***\n");
+    printf("*** - (7) Assunto(s)                              ***\n");
+    printf("*** - (8) Voltar p/ menu anterior                 ***\n");
+    printf("*****************************************************\n");
+
+    printf("- Digite sua opcao que deseja alterar: ");
+
+    scanf("%d", &op);
+    fflush(stdin);
+
+    switch (op)
+    {
+    case 1:
+      break;
+    case 2:
+      break;
+    case 3:
+      break;
+    case 4:
+      break;
+    case 5:
+      break;
+    case 6:
+      break;
+    case 7:
+      break;
+    case 8:
+      break;
+    default:
+      mensagemError(0);
+      break;
+    }
+  }
 }
 
 int incluirLivro()
@@ -196,7 +305,7 @@ TLivro criaLivro()
   livro.anoEdicao = addAno(livro);
 
   // IDIOMA
-  printf("Idioma: ");
+  printf(" Idioma: ");
   gets(stringAux);
   livro.idioma = (char *)malloc((strlen(stringAux) + 1) * sizeof(char));
   strcpy(livro.idioma, stringAux);
@@ -214,7 +323,7 @@ void salvarLivro()
   FILE *Larq; // pra salvar em arquivo precisa declarar uma variavel do tipo file
 
   // abrir o arquivo
-  Larq = fopen("ArqLivros.txt", "aw"); // um dos modos de abrir o arquivo é com w de write onde ele escreve os dados. o W apaga os dados e sobrescreve
+  Larq = fopen("ArqLivros.txt", "w"); // um dos modos de abrir o arquivo é com w de write onde ele escreve os dados. o W apaga os dados e sobrescreve
 
   if (Larq == NULL)
   {
@@ -544,11 +653,13 @@ TAssunto alocarNovoAssuntoEmMemoria(TAssunto assuntos)
 
 void recuperarDadosLivros()
 {
+
   int i, separador, j;
+  int t = 0;
   char str[100], c;
   FILE *Larq; // abre o arquivo
 
-  Larq = fopen("ArqLivros.txt", "ar");
+  Larq = fopen("ArqLivros.txt", "r");
   if (Larq)
   {
     i = 0;         // usado para indexar a string
@@ -558,100 +669,91 @@ void recuperarDadosLivros()
     {
       c = fgetc(Larq); // fgetch pega caracter e posiciona o proximo para leitura até chegar no final.
       if ((c != '\n') && (c != ';') && (c != '@') && (c != '#') && (c != EOF))
-      {
         str[i++] = c;
-      }
-      else if ((c == ';') || (c == '@') || (c == '#') || (c == '\n'))
+
+      if ((c == ';') || (c == '@') || (c == '#') || (c == '\n'))
       {
         str[i] = '\0'; // colocando o \0 forçadamente e tratando final de string
         i = 0;         // i = 0 porque o proximo caractere tem que ir pra primeira posição de novo, sobescrevendo o anterior.
+
         if (c == ';')
         {
+          //  TITULO
           if (separador == 0)
-          { // se for = 0 o titulo é o primeiro q vai mostrar
+          {
             if (_numLivro == 0)
-            {
               _Biblioteca = (TLivro *)malloc(1 * sizeof(TLivro)); // reserva 1 espaco para o ponteiro TLivro
-            }
             else
-            {
-              _Biblioteca = (TLivro *)realloc(_Biblioteca, (_numLivro + 1) * sizeof(_numLivro)); // vai add varios
-            }
+              _Biblioteca = (TLivro *)realloc(_Biblioteca, (_numLivro + 1) * sizeof(TLivro)); // vai add varios
 
-            _Biblioteca[_numLivro].titulo = (char *)malloc(strlen(str) + 1 * sizeof(char)); // reserva espaco do tipo char em função da quantidade de caracteres que vai ter em st
-            strcpy(_Biblioteca[_numLivro].titulo, str);                                     // joga o q esta em titulo para str (que pegamos no arq)
-            _Biblioteca[_numLivro].autores.numAutores = 0;                                  // inicializa em 0, pois n sabemos qnt autores tem
-            _Biblioteca[_numLivro].assuntos.numAssunto = 0;                                 // inicializa em 0, pois n sabemos qnt assunto tem
+            _Biblioteca[_numLivro].titulo = (char *)malloc((strlen(str) + 1) * sizeof(char *)); // reserva espaco do tipo char em função da quantidade de caracteres que vai ter em st
+            strcpy(_Biblioteca[_numLivro].titulo, str);                                         // joga o q esta em titulo para str (que pegamos no arq)
+            _Biblioteca[_numLivro].autores.numAutores = 0;                                      // inicializa em 0, pois n sabemos qnt autores tem
+            _Biblioteca[_numLivro].assuntos.numAssunto = 0;                                     // inicializa em 0, pois n sabemos qnt assunto tem
             separador++;
           }
+
+          // EDITORA
           else if (separador == 1)
           {
-            _Biblioteca[_numLivro].editora = (char *)malloc(strlen(str) + 1 * sizeof(char)); // reserva espaco do tipo char em função da quantidade de caracteres que vai ter em str
+            _Biblioteca[_numLivro].editora = (char *)malloc((strlen(str) + 1) * sizeof(char)); // reserva espaco do tipo char em função da quantidade de caracteres que vai ter em str
             strcpy(_Biblioteca[_numLivro].editora, str);
             separador++;
           }
+
+          // NUM PAGINAS
           else if (separador == 2)
           {
             _Biblioteca[_numLivro].num_pags = atoi(str); // atoi transforma um int em char
             separador++;
           }
 
+          // ANO EDIÇÃO
           else if (separador == 3)
           {
             _Biblioteca[_numLivro].anoEdicao = atoi(str); // atoi transforma um int em char
             separador++;
           }
+
+          //  IDIOMA
           else if (separador == 4)
           {
-            _Biblioteca[_numLivro].idioma = (char *)malloc(strlen(str) + 1 * sizeof(char)); // reserva espaco do tipo char em função da quantidade de caracteres que vai ter em str
+            _Biblioteca[_numLivro].idioma = (char *)malloc((strlen(str) + 1) * sizeof(char)); // reserva espaco do tipo char em função da quantidade de caracteres que vai ter em str
             strcpy(_Biblioteca[_numLivro].idioma, str);
             separador = 0;
           }
-
-          else if (c == '@')
-          {
-            if (separador == 0)
-            {
-              _Biblioteca[_numLivro].autores.autor_es = (char **)malloc(1 * sizeof(char *)); // reservando espaço para uma unica string
-              j = _Biblioteca[_numLivro].autores.numAutores;
-              _Biblioteca[_numLivro].autores.autor_es[j] = (char *)malloc((strlen(str) + 1) * sizeof(char *));
-              strcpy(_Biblioteca[_numLivro].autores.autor_es[j], str);
-              _Biblioteca[_numLivro].autores.numAutores++;
-            }
-          }
-          else
-          {
-            j = _Biblioteca[_numLivro].autores.numAutores;
-            _Biblioteca[_numLivro].autores.autor_es = (char **)realloc(_Biblioteca[_numLivro].autores.autor_es, (j + 1) * sizeof(char *));
-            _Biblioteca[_numLivro].autores.autor_es[j] = (char *)malloc((strlen(str) + 1) * sizeof(char *));
-            strcpy(_Biblioteca[_numLivro].autores.autor_es[j], str);
-            _Biblioteca[_numLivro].autores.numAutores++;
-          }
-          separador = -1;
         }
+
+        // AUTOR(ES)
+        else if (c == '@')
+        {
+          j = _Biblioteca[_numLivro].autores.numAutores;
+
+          if (j == 0)
+            _Biblioteca[_numLivro].autores.autor_es = (char **)malloc(1 * sizeof(char));
+
+          _Biblioteca[_numLivro].autores.autor_es[j] = (char *)malloc((strlen(str) + 1) * sizeof(char *));
+          strcpy(_Biblioteca[_numLivro].autores.autor_es[j], str);
+          _Biblioteca[_numLivro].autores.numAutores++;
+        }
+
+        //  ASSUNTO(S)
         else if (c == '#')
         {
-          if (separador == -1)
-          {
-            _Biblioteca[_numLivro].assuntos.assunto = (char **)malloc(1 * sizeof(char *)); // reservando espaço para uma unica string
-            j = _Biblioteca[_numLivro].assuntos.numAssunto;
-            _Biblioteca[_numLivro].assuntos.assunto[j] = (char *)malloc((strlen(str) + 1) * sizeof(char *));
-            strcpy(_Biblioteca[_numLivro].assuntos.assunto[j], str);
-            _Biblioteca[_numLivro].assuntos.numAssunto++;
-          }
-          else
-          {
-            j = _Biblioteca[_numLivro].assuntos.numAssunto;
-            _Biblioteca[_numLivro].assuntos.assunto = (char **)realloc(_Biblioteca[_numLivro].assuntos.assunto, (j + 1) * sizeof(char *));
-            _Biblioteca[_numLivro].assuntos.assunto[j] = (char *)malloc((strlen(str) + 1) * sizeof(char *));
-            strcpy(_Biblioteca[_numLivro].assuntos.assunto[j], str);
-            _Biblioteca[_numLivro].assuntos.numAssunto++;
-          }
-          separador = -2;
+          t = _Biblioteca[_numLivro].assuntos.numAssunto;
+
+          if (t == 0)
+            _Biblioteca[_numLivro].assuntos.assunto = (char **)malloc(1 * sizeof(char));
+
+          _Biblioteca[_numLivro].assuntos.assunto[t] = (char *)malloc((strlen(str) + 1) * sizeof(char *));
+          strcpy(_Biblioteca[_numLivro].assuntos.assunto[t], str);
+          _Biblioteca[_numLivro].assuntos.numAssunto++;
         }
-        else
+
+        else if (c == '\n')
         {
           separador = 0;
+          // memset(str, 0, sizeof(str));
           _numLivro++;
         }
       }
@@ -663,32 +765,128 @@ void recuperarDadosLivros()
 
 void listarTodosLivros()
 {
+  //  Recuperar os livros salvos
+  _numLivro = 0;
   recuperarDadosLivros();
-  int i;
-  printf("_numlivro: %d", _numLivro);
 
-  /*for (i = 0; i <= _numLivro; i++)
+  if (_numLivro == 0)
+    printf("\n ATENCAO!!!!!!  A Biblioteca esta vazia.....\n\n");
+
+  else
   {
     //  HEADER
+    system("cls");
     printf("*****************************************************\n");
+    printf("***            LISTAR TODOS OS LIVROS             ***\n");
 
-    printf("Titulo    : %s\n", _Biblioteca[i].titulo);
+    int i, l;
 
-    printf("Autor     : ");
-    for (i = 0; i < _Biblioteca[i].autores.numAutores; i++) // imprimir todos os autores
-      printf("%s, ", _Biblioteca[i].autores.autor_es[i]);
+    for (i = 0; i < _numLivro; i++)
+    {
+      //  HEADER
+      printf("*****************************************************\n");
+      printf("LIVRO %d \n", (i + 1));
 
-    printf("\n");
-    printf("Editora   : %s\n", _Biblioteca[i].editora);
-    printf("No Paginas: %d\n", _Biblioteca[i].num_pags);
-    printf("Ano da Edicao: %d\n", _Biblioteca[i].anoEdicao);
-    printf("Idioma    : %s\n", _Biblioteca[i].idioma);
+      printf("Titulo    : %s \n", _Biblioteca[i].titulo);
 
-    printf("Assunto   : ");
-    for (i = 0; i < _Biblioteca[i].assuntos.numAssunto; i++) // imprimir todos os assuntos
-      printf("%s, ", _Biblioteca[i].assuntos.assunto[i]);
+      printf("Autor     : ");
+      for (l = 0; l < _Biblioteca[i].autores.numAutores; l++) // imprimir todos os autores
+        printf("%s, ", _Biblioteca[i].autores.autor_es[l]);
 
-    printf("\n\n");
-  }*/
+      printf("\n");
+      printf("Editora   : %s \n", _Biblioteca[i].editora);
+      printf("No Paginas: %d \n", _Biblioteca[i].num_pags);
+      printf("Ano da Edicao: %d \n", _Biblioteca[i].anoEdicao);
+      printf("Idioma    : %s \n", _Biblioteca[i].idioma);
+
+      printf("Assunto   : ");
+      for (l = 0; l < _Biblioteca[i].assuntos.numAssunto; l++) // imprimir todos os assuntos
+        printf("%s, ", _Biblioteca[i].assuntos.assunto[l]);
+
+      printf("\n\n");
+    }
+  }
   system("pause");
+}
+
+void listarUmLivro()
+{
+  //  Recuperar os livros salvos
+  _numLivro = 0;
+  recuperarDadosLivros();
+
+  if (_numLivro == 0)
+  {
+    mensagemError(-2);
+    system("pause");
+  }
+  else
+  {
+    int i, op;
+
+    while (op != 0)
+    {
+
+      //  HEADER
+      system("cls");
+      printf("*****************************************************\n");
+      printf("***          SELECIONE UM LIVRO DA LISTA          ***\n\n");
+
+      //  CARREGAR A LISTA
+      for (i = 0; i < _numLivro; i++)
+        printf("*** LIVRO %d: %s \n", (i + 1), _Biblioteca[i].titulo);
+
+      //  ESCOLHA UM LIVRO
+      printf("\n");
+      printf("....Para voltar ao Menu anterior digite 0 \n");
+      printf("\n");
+      printf("Selecione um Livro da lista: ");
+
+      scanf("%d", &op);
+      fflush(stdin);
+
+      //  VALIDAR SE É UM LIVRO VÁLIDO
+      if (op > 0 && op < _numLivro)
+        imprimirLivroEscolhido(_Biblioteca[(op - 1)]);
+
+      else
+      {
+        //  Código de retorno ao menu anterior
+        if (op == 0)
+          break;
+
+        mensagemError(0);
+      }
+      system("pause");
+    }
+  }
+}
+
+void imprimirLivroEscolhido(TLivro livro)
+{
+  int i;
+
+  //  HEADER
+  system("cls");
+  printf("*****************************************************\n");
+  printf("***               LIVRO ESCOLHIDO                 ***\n");
+  printf("\n");
+
+  printf("Titulo    : %s\n", livro.titulo);
+
+  printf("Autor     : ");
+  for (i = 0; i < livro.autores.numAutores; i++) // imprimir todos os autores
+    printf("%s, ", livro.autores.autor_es[i]);
+
+  printf("\n");
+  printf("Editora   : %s\n", livro.editora);
+  printf("No Paginas: %d\n", livro.num_pags);
+  printf("Ano da Edicao: %d\n", livro.anoEdicao);
+  printf("Idioma    : %s\n", livro.idioma);
+
+  printf("Assunto   : ");
+  for (i = 0; i < livro.assuntos.numAssunto; i++) // imprimir todos os assuntos
+    printf("%s, ", livro.assuntos.assunto[i]);
+
+  printf("\n\n");
 }

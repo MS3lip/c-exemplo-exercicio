@@ -1025,9 +1025,7 @@ void recuperarDados()
             j = _Biblioteca[_numLivro].numAutores;
 
             if (j == 0)
-            {
               _Biblioteca[_numLivro].autor_es = (char **)malloc(1 * sizeof(char));
-            }
 
             _Biblioteca[_numLivro].autor_es[j] = (char *)malloc((strlen(str) + 1) * sizeof(char *));
             strcpy(_Biblioteca[_numLivro].autor_es[j], str);
@@ -1047,12 +1045,8 @@ void recuperarDados()
           }
           else
           {
-            // t = _Biblioteca[_numLivro].numAssunto;
-
             if (t == 0)
-            {
               _Biblioteca[_numLivro].assunto = (char **)malloc(1 * sizeof(char));
-            }
 
             _Biblioteca[_numLivro].assunto[t] = (char *)malloc((strlen(str) + 1) * sizeof(char *));
             strcpy(_Biblioteca[_numLivro].assunto[t], str);

@@ -1,1 +1,4 @@
-titulo1;editora;10;2023;portugues;autor1@autor2@assunto1#\n
+titulo1;editora;10;2023;portugues;autor@assunto#
+titulo2;editora2;10;2023;portugues;autor2@assunto2#
+titulo3;edotira3;10;223;portugues;autor3@assunto#
+titulo4;editora4;10;2023;portugues;autor4@assunto4#
