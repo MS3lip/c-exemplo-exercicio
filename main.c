@@ -55,7 +55,19 @@ void imprimeLivro(TLivro livro);
 void listarTodosLivros();
 void listarUmLivro();
 void imprimirLivroEscolhido(TLivro livro);
-void menuEditarLivro(TLivro livro);
+void menuEditarLivro(int indiceLivro);
+void editarTitulo(int indiceLivro);
+void editarAutor(int indiceLivro);
+void editarEditora(int indiceLivro);
+void editarNumeroPaginas(int indiceLivro);
+void editarAnoEdicao(int indiceLivro);
+void editarAnoEdicao(int indiceLivro);
+void editarIdioma(int indiceLivro);
+void editarAssunto(int indiceLivro);
+void imprimeLivroParaAlteracao(TLivro livro);
+void carregarTitulosLivros();
+char imprimirAutorLivro(TLivro livro);
+char imprimirAssuntoLivro(TLivro livro);
 
 int main()
 {
@@ -159,7 +171,7 @@ int editarLivro()
   }
   else
   {
-    int i, op;
+    int op = 1; // valor inicial para entrar no loop dos títulos dos livros
 
     while (op != 0)
     {
@@ -168,14 +180,10 @@ int editarLivro()
       printf("*****************************************************\n");
       printf("***        LISTA DE LIVRO - PARA EDICAO           ***\n\n");
 
-      //  CARREGAR A LISTA
-      for (i = 0; i < _numLivro; i++)
-        printf("*** LIVRO %d: %s \n", (i + 1), _Biblioteca[i].titulo);
+      //  Carregar Titulos dos livros
+      carregarTitulosLivros();
 
-      //  ESCOLHA UM LIVRO
-      printf("\n");
-      printf("....Para voltar ao Menu anterior digite 0 \n");
-      printf("\n");
+      printf("\n....Para voltar ao Menu anterior digite 0 \n\n");
       printf("Selecione um Livro da lista: ");
 
       scanf("%d", &op);
@@ -184,12 +192,12 @@ int editarLivro()
       //  VALIDAR SE É UM LIVRO VÁLIDO
       if (op > 0 && op < _numLivro)
       {
-        menuEditarLivro(_Biblioteca[(op - 1)]);
+        menuEditarLivro(op - 1);
         break;
       }
       else
       {
-        //  Código de retorno ao menu anterior
+        //  Código de retorno para o menu anterior
         if (op == 0)
           break;
 
@@ -198,27 +206,27 @@ int editarLivro()
       }
     }
   }
-  return 1;
+  return 2;
 }
 
-void menuEditarLivro(TLivro livro)
+void menuEditarLivro(int indiceLivro)
 {
   int op = 0;
 
   while (op != 8)
   {
     system("cls");
-    printf("*****************************************************\n");
-    printf("***      Digite a opcao que deseja alterar        ***\n");
-    printf("*** - (1) Titulo                                  ***\n");
-    printf("*** - (2) Autor (es)                              ***\n");
-    printf("*** - (3) Editora                                 ***\n");
-    printf("*** - (4) Numero de paginas                       ***\n");
-    printf("*** - (5) Ano de Edicao                           ***\n");
-    printf("*** - (6) Idioma                                  ***\n");
-    printf("*** - (7) Assunto(s)                              ***\n");
-    printf("*** - (8) Voltar p/ menu anterior                 ***\n");
-    printf("*****************************************************\n");
+    printf("*******************************************************************************\n");
+    printf("*** Digite a opcao que deseja alterar  ******          LIVRO  %d            ***\n", (indiceLivro + 1));
+    printf("*** - (1) Titulo                          ***  Titulo  : %s       \n", _Biblioteca[indiceLivro].titulo);
+    printf("*** - (2) Autor (es)                      ***  Autor   : %s       \n", imprimirAutorLivro(_Biblioteca[indiceLivro]));
+    printf("*** - (3) Editora                         ***  Editora : %s       \n", _Biblioteca[indiceLivro].editora);
+    printf("*** - (4) Numero de paginas               ***  Numero de Paginas: \n", _Biblioteca[indiceLivro].num_pags);
+    printf("*** - (5) Ano de Edicao                   ***  Ano da Edicao:     \n", _Biblioteca[indiceLivro].anoEdicao);
+    printf("*** - (6) Idioma                          ***  Idioma   :         \n", _Biblioteca[indiceLivro].idioma);
+    printf("*** - (7) Assunto(s)                      ***  Assunto  :         \n", imprimirAssuntoLivro(_Biblioteca[indiceLivro]));
+    printf("*** - (8) Voltar p/ menu anterior         ***                               ***\n");
+    printf("*******************************************************************************\n");
 
     printf("- Digite sua opcao que deseja alterar: ");
 
@@ -228,18 +236,25 @@ void menuEditarLivro(TLivro livro)
     switch (op)
     {
     case 1:
+      editarTitulo(indiceLivro);
       break;
     case 2:
+      // editarAutor(indiceLivro);
       break;
     case 3:
+      // editarEditora(indiceLivro);
       break;
     case 4:
+      // editarNumeroPaginas(indiceLivro);
       break;
     case 5:
+      // editarAnoEdicao(indiceLivro);
       break;
     case 6:
+      // editarIdioma(indiceLivro);
       break;
     case 7:
+      // editarAssunto(indiceLivro);
       break;
     case 8:
       break;
@@ -248,6 +263,52 @@ void menuEditarLivro(TLivro livro)
       break;
     }
   }
+}
+
+void editarTitulo(int indiceLivro)
+{
+  char stringAux[100];
+
+  system("cls");
+  printf("*****************************************************\n");
+  printf("***      Adicione um Novo Titulo para o Livro     ***\n");
+
+  printf("\n");
+  printf("LIVRO %d: %s \n", (indiceLivro + 1), _Biblioteca[indiceLivro].titulo);
+  printf("NOVO TITULO: ");
+
+  gets(stringAux);
+  _Biblioteca[indiceLivro].titulo = (char *)malloc((strlen(stringAux) + 1) * sizeof(char));
+  strcpy(_Biblioteca[indiceLivro].titulo, stringAux);
+
+  salvarLivro();
+}
+
+void imprimeLivroParaAlteracao(TLivro livro)
+{
+  int i;
+
+  //  HEADER
+  printf("***LIVRO ESCOLHIDO\n");
+  printf("\n");
+
+  printf("Titulo    : %s\n", livro.titulo);
+
+  printf("Autor     : ");
+  for (i = 0; i < livro.autores.numAutores; i++) // imprimir todos os autores
+    printf("%s, ", livro.autores.autor_es[i]);
+
+  printf("\n");
+  printf("Editora   : %s\n", livro.editora);
+  printf("No Paginas: %d\n", livro.num_pags);
+  printf("Ano da Edicao: %d\n", livro.anoEdicao);
+  printf("Idioma    : %s\n", livro.idioma);
+
+  printf("Assunto   : ");
+  for (i = 0; i < livro.assuntos.numAssunto; i++) // imprimir todos os assuntos
+    printf("%s, ", livro.assuntos.assunto[i]);
+
+  printf("\n");
 }
 
 int incluirLivro()
@@ -822,7 +883,7 @@ void listarUmLivro()
   }
   else
   {
-    int i, op;
+    int op;
 
     while (op != 0)
     {
@@ -832,14 +893,11 @@ void listarUmLivro()
       printf("*****************************************************\n");
       printf("***          SELECIONE UM LIVRO DA LISTA          ***\n\n");
 
-      //  CARREGAR A LISTA
-      for (i = 0; i < _numLivro; i++)
-        printf("*** LIVRO %d: %s \n", (i + 1), _Biblioteca[i].titulo);
+      //  Carregar Titulos dos livros
+      carregarTitulosLivros();
 
       //  ESCOLHA UM LIVRO
-      printf("\n");
-      printf("....Para voltar ao Menu anterior digite 0 \n");
-      printf("\n");
+      printf("\n....Para voltar ao Menu anterior digite 0 \n\n");
       printf("Selecione um Livro da lista: ");
 
       scanf("%d", &op);
@@ -889,4 +947,34 @@ void imprimirLivroEscolhido(TLivro livro)
     printf("%s, ", livro.assuntos.assunto[i]);
 
   printf("\n\n");
+}
+
+void carregarTitulosLivros()
+{
+  int i;
+  //  CARREGAR A LISTA DE LIVROS
+  for (i = 0; i < _numLivro; i++)
+    printf("*** LIVRO %d: %s \n", (i + 1), _Biblioteca[i].titulo);
+}
+
+char imprimirAutorLivro(TLivro livro)
+{
+  int i;
+  char *aux[100];
+
+  for (i = 0; i < livro.autores.numAutores; i++) // imprimir todos os autores
+    aux[i] = strlen(livro.autores.autor_es[i]) + ", ";
+
+  return aux;
+}
+
+char imprimirAssuntoLivro(TLivro livro)
+{
+  int i;
+  char aux[100];
+
+  for (i = 0; i < livro.assuntos.numAssunto; i++) // imprimir todos os autores
+    aux[i] = strlen(livro.assuntos.assunto[i]) + ", ";
+
+  return aux;
 }
